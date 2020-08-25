@@ -9,9 +9,15 @@ import { firestore, convertCollectionsSnapshotToMap } from '../../firebase/fireb
 import { connect } from 'react-redux';
 import { updateCollections } from '../../redux/shop/shop.actions';
 
+import WithSpinner from '../../components/with-spinner/with-spinner.component'; // this is a high order component
+
+const CollectionsOverviewWithSpinner = WithSpinner(CollectionOverview);
+const CollectionPageWithSpinner = WithSpinner(CollectionPage);
 
 class ShopPage extends React.Component {
-    
+    state= {
+        loading: true
+    }
 
 // we changed this component to a class because we need to have didmount method here
     unsubscribeFromSnapshot = null; // we will discover later why we are creating this null value
@@ -24,16 +30,23 @@ class ShopPage extends React.Component {
             const collectionMap= convertCollectionsSnapshotToMap(snapShot);
             // console.log(collectionMap);
             updateCollections(collectionMap);
+            this.setState({ loading: false})
         });
     }
     
 
     render () {
-        const { match } = this.props;   
+        const { match } = this.props; 
+        const { loading } = this.state;  
         return(
             <div className='shop-page'>
-                <Route exact path={`${match.url}`} component={CollectionOverview} />
-                <Route exact path={`${match.path}/:collectionId`} component={CollectionPage } />
+                <Route exact path={`${match.url}`} render= { props => (
+                    <CollectionsOverviewWithSpinner isLoading={loading} {...props} />
+                ) } />
+                
+                <Route exact path={`${match.path}/:collectionId`} render = { props => (
+                    <CollectionPageWithSpinner isLoading={loading} {...props} />
+                )} />
             </div>
         );
     }

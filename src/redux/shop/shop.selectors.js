@@ -11,9 +11,9 @@ export const collectionsSelector = createSelector([selectShop],
 // notice first we extract the keys of the collections object then with map we create a new array with going through the object
 
 export const selectCollectionForPreview = createSelector([collectionsSelector],
-    collections => Object.keys(collections).map(key => collections[key])
+    collections =>collections ? Object.keys(collections).map(key => collections[key]) : []
 );
 export const collectionSelector = collectionUrlParam => createSelector(
     [collectionsSelector],
-    collections => collections[collectionUrlParam]
+    collections => ( collections? collections[collectionUrlParam] : null)
 );
