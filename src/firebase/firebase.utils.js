@@ -39,6 +39,37 @@ const config = {
     return userRef;
   }
 
+  export const addCollectionAndDocuments = async (collectionKey, objectToAdd) => {
+    const collectionRef = firestore.collection(collectionKey);
+
+    const batch = firestore.batch();
+
+    objectToAdd.forEach(obj => {
+      const newDocRef = collectionRef.doc();
+      batch.set(newDocRef, obj)
+    });
+
+    return await batch.commit();
+  }
+  export const convertCollectionsSnapshotToMap = (collections) => {
+    const transformedCollections = collections.docs.map( doc => {
+      const { title, items } = doc.data();
+      return{
+        routeName: encodeURI(title.toLowerCase()),
+        id: doc.id,
+        title,
+        items
+      }
+    });
+    // console.log(transformedCollections); until here it an array only we added route name and id
+    return transformedCollections.reduce( (accumulator, collection) => {
+      accumulator[collection.title.toLowerCase()] = collection;
+      return accumulator;
+    }, {} );
+    // at this point we changed it to an object that each part of it is an object and we assigned a name for each part
+  }
+  
+
   firebase.initializeApp(config);
 
   export const auth = firebase.auth();

@@ -7,7 +7,9 @@ import { setCurrentUser } from './redux/user/user.actions';
 import { createStructuredSelector } from 'reselect';
 import { selectCurrentUser } from './redux/user/user.selectors';
 
-import { auth, createUserPropileDocument } from './firebase/firebase.utils';
+import { selectCollectionForPreview } from './redux/shop/shop.selectors';
+
+import { auth, createUserPropileDocument, addCollectionAndDocuments } from './firebase/firebase.utils';
 
 //Import Components
 import HomePage from './pages/homepage/homepage.component';
@@ -22,7 +24,7 @@ class App extends React.Component {
   unsubscribeFromAuth = null;
 
   componentDidMount () {
-    const { setCurrentUser } = this.props;
+    const { setCurrentUser, collectionArray } = this.props;
 
     this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
       if (userAuth) {
@@ -35,7 +37,9 @@ class App extends React.Component {
           });
         });
       }      
-      setCurrentUser(userAuth);      
+      setCurrentUser(userAuth); 
+      // addCollectionAndDocuments('collections', collectionArray.map( ({title, items}) => ({title, items}) )); c    
+      // we executed the above code just one time for adding data to the database
     });
   }
   componentWillUnmount() {
@@ -59,7 +63,8 @@ class App extends React.Component {
   }
 }
 const mapStateToProps = createStructuredSelector({
-  currentUser: selectCurrentUser
+  currentUser: selectCurrentUser,
+  collectionArray: selectCollectionForPreview
 });
 const mapDispatchToProps = dispatch => ({
   setCurrentUser: user => dispatch(setCurrentUser(user))
